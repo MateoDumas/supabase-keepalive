@@ -1,0 +1,35 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    - cron: '0 12 * * *'  # Diario a las 12:00 UTC
+  workflow_dispatch:       # Permitir ejecución manual
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install dependencies
+        run: npm install @supabase/supabase-js dotenv
+        
+      - name: Run Keep-Alive Ping
+        run: node ping-supabase.js
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_PROJECTS: ${{ secrets.SUPABASE_PROJECTS }}
+          
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ El bot de Keep-Alive ha fallado en la ejecución programada."
+          echo "Por favor, revisa los logs en la pestaña Actions y verifica tus secretos de GitHub y el estado de Supabase."
