@@ -26,6 +26,9 @@ GRANT EXECUTE ON FUNCTION public.ping TO authenticated;
 GRANT EXECUTE ON FUNCTION public.ping TO service_role;
 
 -- 5. Políticas de RLS
+-- Borrar política si existe para evitar errores al re-ejecutar
+DROP POLICY IF EXISTS "Permitir acceso anónimo para mantenimiento" ON keepalive;
+
 -- Política simple para permitir que cualquiera con la anon key pueda insertar y seleccionar
 CREATE POLICY "Permitir acceso anónimo para mantenimiento" 
 ON keepalive FOR ALL 
