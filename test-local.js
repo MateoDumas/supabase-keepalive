@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import ws from 'ws';
 
 // 1. Cargar variables de entorno (solo para desarrollo local)
 dotenv.config();
@@ -42,7 +43,11 @@ async function testProject(project) {
   const projectName = name || url;
   
   console.log(`\n🔄 Probando proyecto: ${projectName}`);
-  const supabase = createClient(url, key);
+  const supabase = createClient(url, key, {
+    realtime: {
+      transport: ws,
+    },
+  });
   
   try {
     // Probar la conexión básica

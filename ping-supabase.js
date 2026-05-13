@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import ws from 'ws';
 
 // 1. Cargar variables de entorno (solo para desarrollo local)
 dotenv.config();
@@ -79,7 +80,11 @@ async function pingSingleProject(project) {
   const projectName = name || url;
   
   console.log(`\n🔄 Iniciando Keep-Alive para: ${projectName}`);
-  const supabase = createClient(url, key);
+  const supabase = createClient(url, key, {
+    realtime: {
+      transport: ws,
+    },
+  });
   const strategies = getStrategies(supabase);
   
   let success = false;
