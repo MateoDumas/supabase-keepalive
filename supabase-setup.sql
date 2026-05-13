@@ -14,11 +14,18 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- 3. Habilitar RLS (Seguridad)
--- Por defecto la tabla es accesible con la anon key si no se definen políticas estrictas, 
--- pero para este bot de mantenimiento usualmente se usa el cliente de Supabase con la anon key.
--- Si tienes RLS activado, asegúrate de tener una política que permita el acceso.
 ALTER TABLE keepalive ENABLE ROW LEVEL SECURITY;
 
+-- 4. Dar permisos explícitos (Requerido por cambios de seguridad de Supabase 2026)
+-- Esto permite que la API (supabase-js) pueda acceder a la tabla y función
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.keepalive TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.keepalive TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.keepalive TO service_role;
+GRANT EXECUTE ON FUNCTION public.ping TO anon;
+GRANT EXECUTE ON FUNCTION public.ping TO authenticated;
+GRANT EXECUTE ON FUNCTION public.ping TO service_role;
+
+-- 5. Políticas de RLS
 -- Política simple para permitir que cualquiera con la anon key pueda insertar y seleccionar
 CREATE POLICY "Permitir acceso anónimo para mantenimiento" 
 ON keepalive FOR ALL 
